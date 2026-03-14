@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Harmonium Metalmind Index</title>
+    <style>
+      body {
+        font-family: "Georgia", serif;
+        background: #f4f1ea;
+        color: #2e2e2e;
+        padding: 40px;
+        font-size: 16px;
+      }
+
+      h1 {
+        font-size: 32px;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+      }
+
+      h2 {
+        margin-top: 40px;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 5px;
+      }
+
+      input, textarea {
+        margin: 6px 0;
+        width: 320px;
+        padding: 6px;
+        border: 1px solid #bbb;
+        border-radius: 4px;
+        font-family: inherit;
+        font-style: italic;
+        font-size: 18px;
+      }
+
+      /* METAL DROPDOWN */
+      select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+
+        font-size: 18px;
+        /* font-style: italic; */
+        padding: 8px 40px 8px 12px;
+        width: 320px;
+        height: 42px;
+
+        color: #1f1f1f;
+
+        background:
+          linear-gradient(145deg, #d9d9d9, #bfbfbf);
+
+        border: 1px solid #8c8c8c;
+        border-radius: 6px;
+
+        box-shadow:
+          inset 0 1px 2px rgba(255,255,255,0.6),
+          inset 0 -2px 3px rgba(0,0,0,0.15),
+          0 2px 4px rgba(0,0,0,0.15);
+
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+
+      textarea {
+        min-height: 70px;
+      }
+
+      button {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        background: #3a5a78;
+        color: white;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        font-size: 16px;
+      }
+
+      button:hover {
+        background: #2c445c;
+      }
+
+      .box {
+        margin-top: 20px;
+        padding: 20px;
+        border-radius: 6px;
+        background: white;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      }
+
+      table {
+        background: white;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      }
+
+      th {
+        background: #ece7dc;
+        padding: 8px;
+        font-weight: bold;
+      }
+
+      td {
+        padding: 8px;
+        text-align: center;
+        transition: transform 0.08s ease, box-shadow 0.08s ease;
+      }
+
+      td:hover {
+        transform: scale(1.03);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      }
+
+      .green-cell {
+        background: #d8e6d2;
+      }
+
+      .red-cell {
+        background: #efd4d4;
+      }
+
+      .grey-cell {
+        background: #f0f0f0;
+      }
+
+      #modalOverlay {
+        backdrop-filter: blur(4px);
+      }
+
+      #modalBox {
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+        animation: fadeIn 0.15s ease;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+      }
+    </style>
+</head>
+<body>
+
+<h1>Harmonium Metalmind Index</h1>
+
+<h2>Harmonization Matrix</h2>
+<div id="matrixContainer" style="overflow:auto;"></div>
+
+<hr>
+
+<h2>Lookup Combination</h2>
+<select id="powerA"></select>
+<select id="powerB"></select>
+<br>
+<button onclick="lookup()">Harmonize</button>
+
+<div class="box" id="result" style="display:none;"></div>
+
+<hr>
+<div class="box">
+  <h2>Add Power</h2>
+  <input id="newName" placeholder="Power name">
+  <br>
+  <textarea id="newDesc" placeholder="Description"></textarea>
+
+
+  <h3>Select Tags</h3>
+  <div id="tagList"></div>
+
+  <button onclick="addPower()">Add Power</button>
+</div>
+
+<hr>
+
+<div class="box">
+  <h2>Add Tag</h2>
+  <input id="newTagName" placeholder="Tag name">
+  <button onclick="addTag()">Add Tag</button>
+</div>
+
+<hr>
+
+<div class="box">
+  <h2>Add Harmonization</h2>
+  <select id="comboA"></select>
+  <select id="comboB"></select>
+  <br>
+  <input id="resultName" placeholder="Result Name">
+  <br>
+  <textarea id="resultSummary" placeholder="Summary"></textarea>
+  <br>
+  <button onclick="addHarmonization()">Add Combination</button>
+</div> 
+
+<hr>
+
+<div class="box">
+  <h2>Manage Tags</h2>
+  <div id="manageTags"></div>
+</div>
+
+<div class="box">
+  <h2>Manage Powers</h2>
+  <div id="managePowers"></div>
+</div>
+
+<div class="box">
+  <h2>Manage Harmonizations</h2>
+  <div id="manageHarmonizations"></div>
+</div>
+
+<div id="modalOverlay" style="
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.6);
+  justify-content:center;
+  align-items:center;
+">
+
+  <div id="modalBox" style="
+    background:white;
+    padding:20px;
+    width:400px;
+    max-width:90%;
+    border-radius:6px;
+  ">
+    <div id="modalContent"></div>
+    <br>
+    <button onclick="closeModal()">Close</button>
+  </div>
+
+</div>
+
+<script>
+
+async function loadTags() {
+  const res = await fetch("/api/tags");
+  const tags = await res.json();
+
+  const tagList = document.getElementById("tagList");
+  tagList.innerHTML = "";
+
+  tags.forEach(tag => {
+    tagList.innerHTML += `
+      <label>
+        <input type="checkbox" value="${tag.id}">
+        ${tag.name}
+      </label><br>
+    `;
+  });
+}
+
+async function loadPowers() {
+  const res = await fetch("/api/powers");
+  const powers = await res.json();
+
+  const selects = ["powerA", "powerB", "comboA", "comboB"];
+  selects.forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = "<option value=''>Select Power</option>";
+    powers.forEach(p => {
+      sel.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+    });
+  });
+}
+
+async function addTag() {
+  const name = document.getElementById("newTagName").value;
+
+  await fetch("/api/tags", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name })
+  });
+
+  loadTags();
+  loadManageTags();
+  alert("Tag added!")
+}
+
+async function addPower() {
+  const name = document.getElementById("newName").value;
+  const description = document.getElementById("newDesc").value;
+
+  const selectedTags = Array.from(
+    document.querySelectorAll("#tagList input:checked")
+  ).map(cb => parseInt(cb.value));
+
+  await fetch("/api/powers", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, description, tags: selectedTags })
+  });
+
+  loadPowers();
+  loadManagePowers();
+  loadMatrix();
+  alert("Power added!");
+}
+
+async function lookup() {
+  const a = document.getElementById("powerA").value;
+  const b = document.getElementById("powerB").value;
+
+  if (!a || !b) return;
+
+  const res = await fetch(`/api/harmonize?a=${a}&b=${b}`);
+  const resultBox = document.getElementById("result");
+
+  if (res.status !== 200) {
+    resultBox.style.display = "block";
+    resultBox.innerHTML = "No known harmonization.";
+    return;
+  }
+
+  const data = await res.json();
+  resultBox.style.display = "block";
+  resultBox.innerHTML = `
+    <h2>${data.result_name}</h2>
+    <p style="line-height:1.6;">${data.summary}</p>
+  `;
+}
+
+async function addHarmonization() {
+  const a = document.getElementById("comboA").value;
+  const b = document.getElementById("comboB").value;
+  const result_name = document.getElementById("resultName").value;
+  const summary = document.getElementById("resultSummary").value;
+
+  const res = await fetch("/api/harmonize", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ 
+      a: parseInt(a), 
+      b: parseInt(b), 
+      result_name, 
+      summary 
+    })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert("Error: " + data.error);
+    return;
+  }
+  loadManageHarmonizations();
+  loadMatrix();
+  alert("Combination added!");
+}
+
+async function loadManageTags() {
+  const res = await fetch("/api/tags");
+  const tags = await res.json();
+
+  const div = document.getElementById("manageTags");
+  div.innerHTML = "";
+
+  tags.forEach(tag => {
+    div.innerHTML += `
+      ${tag.name}
+      <button onclick="deleteTag(${tag.id}, '${tag.name}')">Delete</button>
+      <br>
+    `;
+  });
+}
+
+async function deleteTag(id, name) {
+  const confirmDelete = confirm(`Delete tag "${name}"?\n\nThis will remove it from all powers.`);
+
+  if (!confirmDelete) return;
+
+  await fetch(`/api/tags/${id}`, { method: "DELETE" });
+
+  loadTags();
+  loadManageTags();
+}
+
+async function loadManagePowers() {
+  const res = await fetch("/api/powers");
+  const powers = await res.json();
+
+  const div = document.getElementById("managePowers");
+  div.innerHTML = "";
+
+  powers.forEach(power => {
+    div.innerHTML += `
+      <div style="margin-bottom:10px;">
+        <strong>${power.name}</strong>
+        (${power.tags.join(", ")})
+        <button onclick="editPower(${power.id})">Edit</button>
+        <button onclick="showTagEditor(${power.id}, '${power.name}')">Edit Tags</button>
+        <button onclick="deletePower(${power.id}, '${power.name}')">Delete</button>
+
+        <div id="power-editor-${power.id}" style="margin-left:20px;"></div>
+      </div>
+    `;
+  });
+}
+
+async function deletePower(id, name) {
+  const confirmDelete = confirm(
+    `Delete power "${name}"?\n\nThis will also delete:\n- All tag assignments\n- All harmonizations using this power`
+  );
+
+  if (!confirmDelete) return;
+
+  await fetch(`/api/powers/${id}`, { method: "DELETE" });
+
+  loadPowers();
+  loadMatrix();
+  loadManagePowers();
+  loadManageHarmonizations();
+}
+
+async function loadManageHarmonizations() {
+  const res = await fetch("/api/harmonizations");
+  const list = await res.json();
+
+  const div = document.getElementById("manageHarmonizations");
+  div.innerHTML = "";
+
+  list.forEach(h => {
+    const description = `${h.power_a_name} + ${h.power_b_name}`;
+
+    div.innerHTML += `
+      <div style="margin-bottom:10px;">
+        ${description}
+        → <strong>${h.result_name}</strong>
+        <button onclick="editHarmonization(${h.id})">Edit</button>
+        <button onclick="deleteHarmonization(${h.id}, '${description} → ${h.result_name}')">Delete</button>
+
+        <div id="harm-editor-${h.id}" style="margin-left:20px;"></div>
+      </div>
+    `;
+  });
+}
+
+async function deleteHarmonization(id, description) {
+  const confirmDelete = confirm(`Delete harmonization:\n${description}?`);
+
+  if (!confirmDelete) return;
+
+  await fetch(`/api/harmonizations/${id}`, { method: "DELETE" });
+
+  loadManageHarmonizations();
+  loadMatrix();
+}
+
+async function showTagEditor(powerId, powerName) {
+  const tagRes = await fetch("/api/tags");
+  const allTags = await tagRes.json();
+
+  const powerRes = await fetch("/api/powers");
+  const powers = await powerRes.json();
+
+  const power = powers.find(p => p.id === powerId);
+
+  const editorDiv = document.getElementById(`power-editor-${powerId}`);
+
+  editorDiv.innerHTML = `
+    <strong>Edit Tags for ${powerName}</strong><br>
+  `;
+
+  allTags.forEach(tag => {
+    const checked = power.tags.includes(tag.name) ? "checked" : "";
+
+    editorDiv.innerHTML += `
+      <label>
+        <input type="checkbox" value="${tag.id}" ${checked}>
+        ${tag.name}
+      </label><br>
+    `;
+  });
+
+  editorDiv.innerHTML += `
+    <button onclick="saveTagChanges(${powerId})">Save</button>
+    <hr>
+  `;
+}
+
+async function saveTagChanges(powerId) {
+  const editorDiv = document.getElementById(`power-editor-${powerId}`);
+
+  const selectedTags = Array.from(
+    editorDiv.querySelectorAll("input[type='checkbox']:checked")
+  ).map(cb => parseInt(cb.value));
+
+  await fetch(`/api/powers/${powerId}/tags`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ tags: selectedTags })
+  });
+
+  // Refresh UI
+  loadPowers();
+  loadManagePowers();
+
+  // Close the editor
+  document.getElementById(`power-editor-${powerId}`).innerHTML = "";
+}
+
+async function editPower(id) {
+  const res = await fetch("/api/powers");
+  const powers = await res.json();
+  const power = powers.find(p => p.id === id);
+
+  const editor = document.getElementById(`power-editor-${id}`);
+
+  editor.innerHTML = `
+    Name:<br>
+    <input id="edit-name-${id}" value="${power.name}"><br>
+    Description:<br>
+    <textarea id="edit-desc-${id}">${power.description || ""}</textarea><br>
+    <button onclick="savePower(${id})">Save</button>
+    <button onclick="cancelEditPower(${id})">Cancel</button>
+  `;
+}
+
+function cancelEditPower(id) {
+  document.getElementById(`power-editor-${id}`).innerHTML = "";
+}
+
+async function savePower(id) {
+  const name = document.getElementById(`edit-name-${id}`).value;
+  const description = document.getElementById(`edit-desc-${id}`).value;
+
+  const res = await fetch(`/api/powers/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, description })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert(data.error);
+    return;
+  }
+
+  loadPowers();
+  loadManagePowers();
+  loadMatrix();
+}
+
+async function editHarmonization(id) {
+  const res = await fetch("/api/harmonizations");
+  const list = await res.json();
+  const h = list.find(x => x.id === id);
+
+  const editor = document.getElementById(`harm-editor-${id}`);
+
+  editor.innerHTML = `
+    Result Name:<br>
+    <input id="edit-hname-${id}" value="${h.result_name}"><br>
+    Summary:<br>
+    <textarea id="edit-hsummary-${id}">${h.summary || ""}</textarea><br>
+    <button onclick="saveHarmonization(${id})">Save</button>
+    <button onclick="cancelEditHarmonization(${id})">Cancel</button>
+  `;
+}
+
+function cancelEditHarmonization(id) {
+  document.getElementById(`harm-editor-${id}`).innerHTML = "";
+}
+
+async function saveHarmonization(id) {
+  const result_name = document.getElementById(`edit-hname-${id}`).value;
+  const summary = document.getElementById(`edit-hsummary-${id}`).value;
+
+  const res = await fetch(`/api/harmonizations/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ result_name, summary })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert(data.error);
+    return;
+  }
+
+  loadManageHarmonizations();
+  loadMatrix();
+}
+
+async function loadMatrix() {
+  const res = await fetch("/api/matrix");
+  const { powers, matrix } = await res.json();
+
+  const container = document.getElementById("matrixContainer");
+
+  let html = "<table border='1' cellpadding='5' style='border-collapse:collapse;'>";
+
+  // Header row
+  html += "<tr><th></th>";
+  powers.forEach(p => {
+    html += `<th>${p.name}</th>`;
+  });
+  html += "</tr>";
+
+  // Rows
+  powers.forEach((rowPower, rowIndex) => {
+    html += `<tr><th>${rowPower.name}</th>`;
+
+    powers.forEach((colPower, colIndex) => {
+
+      if (colIndex <= rowIndex) {
+        html += '<td class="grey-cell"></td>';
+        return;
+      }
+
+      const a = Math.min(rowPower.id, colPower.id);
+      const b = Math.max(rowPower.id, colPower.id);
+      const key = `${a}-${b}`;
+
+      if (matrix[key]) {
+        html += `
+          <td class="green-cell"
+              onclick="viewHarmonization(${matrix[key].id})">
+              ${matrix[key].result_name}
+          </td>
+        `;
+      } else {
+        html += `
+          <td class="red-cell"
+              onclick="quickAddHarmonization(${a}, ${b})">
+              +
+          </td>
+        `;
+      }
+
+    });
+
+    html += "</tr>";
+  });
+
+  html += "</table>";
+  container.innerHTML = html;
+}
+
+async function quickAddHarmonization(a, b) {
+  const result_name = prompt("Result Name:");
+  if (!result_name) return;
+
+  const summary = prompt("Summary:");
+
+  const res = await fetch("/api/harmonize", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ a, b, result_name, summary })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert(data.error);
+    return;
+  }
+
+  loadManageHarmonizations();
+  loadMatrix();
+}
+
+async function viewHarmonization(id) {
+  const res = await fetch("/api/matrix");
+  const { matrix } = await res.json();
+
+  const harmonization = Object.values(matrix).find(h => h.id === id);
+
+  const modalContent = document.getElementById("modalContent");
+
+  modalContent.innerHTML = `
+    <h2 style="margin-top:0">${harmonization.result_name}</h2>
+    <p style="font-style:italic; color:#666;">
+      ${harmonization.power_a_name} + ${harmonization.power_b_name}
+    </p>
+    <hr>
+    <p style="line-height:1.6;">
+      ${harmonization.summary || "No summary recorded."}
+    </p>
+  `;
+
+  document.getElementById("modalOverlay").style.display = "flex";
+}
+
+function closeModal() {
+  document.getElementById("modalOverlay").style.display = "none";
+}
+
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Escape") {
+    closeModal();
+  }
+});
+
+loadTags();
+loadPowers();
+loadManageTags();
+loadManagePowers();
+loadManageHarmonizations();
+loadMatrix();
+
+</script>
+
+</body>
+</html>
